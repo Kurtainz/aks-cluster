@@ -32,4 +32,84 @@ resource "azurerm_kubernetes_cluster" "aks" {
   identity {
     type = "SystemAssigned"
   }
+
+  key_vault_secrets_provider {
+    secret_rotation_enabled = false
+  }
 }
+
+resource "azurerm_kubernetes_cluster_extension" "flux" {
+  name           = "flux"
+  cluster_id     = azurerm_kubernetes_cluster.aks.id
+  extension_type = "microsoft.flux"
+}
+
+resource "azurerm_kubernetes_flux_configuration" "aks_sync" {
+  name       = "aks-system"
+  cluster_id = azurerm_kubernetes_cluster.aks.id
+  namespace  = "flux-system"
+  scope      = "cluster"
+
+  git_repository {
+    url             = "https://github.com/Kurtainz/aks-cluster"
+    reference_type  = "branch"
+    reference_value = "main"
+
+    ssh_private_key_base64 = base64encode(file("~/.ssh/aks-cluster"))
+  }
+
+  kustomizations {
+    name                      = "infra-controllers"
+    path                      = "./infrastructure/controllers/staging"
+    sync_interval_in_seconds  = 300
+  }
+
+  kustomizations {
+    name                      = "infra-configs"
+    path                      = "./infrastructure/configs/staging"
+    sync_interval_in_seconds  = 300
+    depends_on                = ["infra-controllers"]
+  }
+
+  kustomizations {
+    name                      = "apps"
+    path                      = "./apps/staging"
+    sync_interval_in_seconds  = 300
+    # This ensures infra (Ingress/Cert-Manager) is ready before apps deploy
+    depends_on                = ["infra-configs"]
+  }
+
+  depends_on = [azurerm_kubernetes_cluster_extension.flux]
+}
+
+## Key vault
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_key_vault" "aks-cluster-vault" {
+  name                = "kv-aks-cluster-staging"
+  location            = azurerm_resource_group.aks_rg.location
+  resource_group_name = azurerm_resource_group.aks_rg.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = "standard"
+
+  soft_delete_retention_days = 7
+  purge_protection_enabled   = false
+
+  enable_rbac_authorization = true
+  depends_on                 = [azurerm_kubernetes_cluster.aks]
+}
+
+resource "azurerm_role_assignment" "kv_admin" {
+  scope                = azurerm_key_vault.aks-cluster-vault.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+resource "azurerm_role_assignment" "aks_keyvault_secrets_provider" {
+  scope                = azurerm_key_vault.aks-cluster-vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_kubernetes_cluster.aks.key_vault_secrets_provider[0].secret_identity[0].object_id
+}
+
+
