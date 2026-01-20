@@ -17,11 +17,13 @@ resource "azurerm_resource_group" "aks_rg" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                = "experiment-cluster"
-  location            = azurerm_resource_group.aks_rg.location
-  resource_group_name = azurerm_resource_group.aks_rg.name
-  sku_tier            = "Free"
-  dns_prefix          = "aks-test"
+  name                      = "experiment-cluster"
+  location                  = azurerm_resource_group.aks_rg.location
+  resource_group_name       = azurerm_resource_group.aks_rg.name
+  sku_tier                  = "Free"
+  dns_prefix                = "aks-test"
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
 
   default_node_pool {
     name       = "default"
@@ -32,10 +34,27 @@ resource "azurerm_kubernetes_cluster" "aks" {
   identity {
     type = "SystemAssigned"
   }
+}
 
-  key_vault_secrets_provider {
-    secret_rotation_enabled = false
-  }
+resource "azurerm_user_assigned_identity" "eso_identity" {
+  name                = "id-eso-secrets-manager"
+  location            = azurerm_resource_group.aks_rg.location
+  resource_group_name = azurerm_resource_group.aks_rg.name
+}
+
+resource "azurerm_role_assignment" "eso_kv_secrets" {
+  scope                = azurerm_key_vault.aks-cluster-vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_user_assigned_identity.eso_identity.principal_id
+}
+
+resource "azurerm_federated_identity_credential" "eso_federated" {
+  name                = "eso-federated-credential"
+  resource_group_name = azurerm_resource_group.aks_rg.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.eso_identity.id
+  subject             = "system:serviceaccount:external-secrets:external-secrets-sa"
 }
 
 resource "azurerm_kubernetes_cluster_extension" "flux" {
@@ -105,11 +124,4 @@ resource "azurerm_role_assignment" "kv_admin" {
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
 }
-
-resource "azurerm_role_assignment" "aks_keyvault_secrets_provider" {
-  scope                = azurerm_key_vault.aks-cluster-vault.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_kubernetes_cluster.aks.key_vault_secrets_provider[0].secret_identity[0].object_id
-}
-
 
