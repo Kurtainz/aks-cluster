@@ -78,24 +78,8 @@ resource "azurerm_kubernetes_flux_configuration" "aks_sync" {
   }
 
   kustomizations {
-    name                      = "infra-controllers"
-    path                      = "./kubernetes/infrastructure/controllers/staging"
-    sync_interval_in_seconds  = 300
-  }
-
-  kustomizations {
-    name                      = "infra-configs"
-    path                      = "./kubernetes/infrastructure/configs/staging"
-    sync_interval_in_seconds  = 300
-    depends_on                = ["infra-controllers"]
-  }
-
-  kustomizations {
-    name                      = "apps"
-    path                      = "./kubernetes/apps/staging"
-    sync_interval_in_seconds  = 300
-    # This ensures infra (Ingress/Cert-Manager) is ready before apps deploy
-    depends_on                = ["infra-configs"]
+    name = "cluster-bootstrap"
+    path = "./kubernetes/clusters/staging"
   }
 
   depends_on = [azurerm_kubernetes_cluster_extension.flux]
