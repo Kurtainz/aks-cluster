@@ -11,8 +11,6 @@ spec:
     kind: GitRepository
     name: aks-system
   healthChecks:
-    - kind: CustomResourceDefinition
-      name: clustersecretstores.external-secrets.io
     - kind: Deployment
       name: external-secrets
       namespace: external-secrets
