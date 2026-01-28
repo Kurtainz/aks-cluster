@@ -5,6 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
+  force: true
   path: ./kubernetes/infrastructure/controllers/staging
   prune: true
   sourceRef:
@@ -14,6 +15,8 @@ spec:
     - kind: Deployment
       name: external-secrets
       namespace: external-secrets
+    - kind: CustomResourceDefinition
+      name: clustersecretstores.external-secrets.io
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
