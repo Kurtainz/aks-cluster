@@ -15,8 +15,9 @@ spec:
     - kind: Deployment
       name: external-secrets
       namespace: external-secrets
-    - kind: CustomResourceDefinition
-      name: clustersecretstores.external-secrets.io
+    - kind: Deployment
+      name: external-secrets-webhook
+      namespace: external-secrets
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
