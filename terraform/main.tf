@@ -124,6 +124,7 @@ resource "kubernetes_config_map_v1" "flux_vars" {
 
   data = {
     ESO_CLIENT_ID = azurerm_user_assigned_identity.eso_identity.client_id
+    TENANT_ID     = data.azurerm_client_config.current.tenant_id
   }
 }
 
