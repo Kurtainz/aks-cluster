@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   releaseName: external-secrets
-  targetNamespace: external-secrets # Installs into your new namespace
+  targetNamespace: external-secrets
   interval: 1h
   chart:
     spec:
