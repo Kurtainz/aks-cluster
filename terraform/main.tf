@@ -58,10 +58,11 @@ resource "azurerm_key_vault_secret" "db_password" {
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
-resource "cloudflare_zero_trust_tunnel" "prod_tunnel" {
+resource "cloudflare_zero_trust_tunnel_cloudflared" "prod_tunnel" {
   account_id = var.cloudflare_account_id
   name       = "app-production-tunnel"
-  secret     = var.tunnel_secret
+  tunnel_secret     = var.tunnel_secret
+  config_src    = "cloudflare"
 }
 
 # Store the token for Cloudflare Tunnel in the key vault
