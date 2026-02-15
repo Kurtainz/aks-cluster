@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
 resource "azurerm_resource_group" "aks_rg" {
   name     = "aks-test"
   location = "uksouth"
@@ -65,9 +52,23 @@ resource "random_password" "n8n_db_pass" {
 }
 
 # Add the generated password to Key Vault
-resource "azure_keyvault_secret" "db_password" {
+resource "azurerm_key_vault_secret" "db_password" {
   name         = "n8n-postgres-password"
   value        = random_password.n8n_db_pass.result
+  key_vault_id = azurerm_key_vault.aks-cluster-vault.id
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared" "prod_tunnel" {
+  account_id = var.cloudflare_account_id
+  name       = "app-production-tunnel"
+  secret     = var.tunnel_secret
+  config_src    = "cloudflare"
+}
+
+# Store the token for Cloudflare Tunnel in the key vault
+resource "azurerm_key_vault_secret" "tunnel_token" {
+  name         = "cloudflare-tunnel-token"
+  value        = cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.tunnel_token
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
@@ -88,7 +89,7 @@ resource "azurerm_kubernetes_flux_configuration" "aks_sync" {
     reference_type  = "branch"
     reference_value = "main"
 
-    ssh_private_key_base64 = base64encode(file("~/.ssh/aks-cluster"))
+    ssh_private_key_base64 = base64encode(var.flux_ssh_key)
   }
 
   kustomizations {
@@ -142,6 +143,3 @@ resource "kubernetes_config_map_v1" "flux_vars" {
   }
 }
 
-output "eso_identity_id" {
-  value = azurerm_user_assigned_identity.eso_identity.client_id
-}
