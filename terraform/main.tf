@@ -61,7 +61,7 @@ resource "azurerm_key_vault_secret" "db_password" {
 resource "cloudflare_zero_trust_tunnel_cloudflared" "prod_tunnel" {
   account_id = var.cloudflare_account_id
   name       = "app-production-tunnel"
-  secret     = var.tunnel_secret
+  tunnel_secret     = var.tunnel_secret
   config_src    = "cloudflare"
 }
 
