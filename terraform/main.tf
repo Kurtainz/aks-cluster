@@ -73,7 +73,7 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "prod_tunnel_token" {
 # Store the token for Cloudflare Tunnel in the key vault
 resource "azurerm_key_vault_secret" "tunnel_token" {
   name         = "cloudflare-tunnel-token"
-  value        = cloudflare_zero_trust_tunnel_cloudflared_token.prod_tunnel_token.token
+  value        = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod_tunnel_token.token
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
