@@ -58,10 +58,14 @@ resource "azurerm_key_vault_secret" "db_password" {
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
+resource "random_id" "tunnel_secret" {
+  byte_length = 32
+}
+
 resource "cloudflare_zero_trust_tunnel_cloudflared" "prod_tunnel" {
   account_id        = var.cloudflare_account_id
   name              = "app-production-tunnel"
-  tunnel_secret     = var.tunnel_secret
+  tunnel_secret     = random_id.tunnel_secret.b64_std
   config_src        = "cloudflare"
 }
 
