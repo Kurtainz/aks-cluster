@@ -58,29 +58,6 @@ resource "azurerm_key_vault_secret" "db_password" {
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
-resource "random_id" "tunnel_secret" {
-  byte_length = 32
-}
-
-resource "cloudflare_zero_trust_tunnel_cloudflared" "prod_tunnel" {
-  account_id        = var.cloudflare_account_id
-  name              = "app-production-tunnel"
-  tunnel_secret     = random_id.tunnel_secret.b64_std
-  config_src        = "cloudflare"
-}
-
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "prod_tunnel_token" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id
-}
-
-# Store the token for Cloudflare Tunnel in the key vault
-resource "azurerm_key_vault_secret" "tunnel_token" {
-  name         = "cloudflare-tunnel-token"
-  value        = data.cloudflare_zero_trust_tunnel_cloudflared_token.prod_tunnel_token.token
-  key_vault_id = azurerm_key_vault.aks-cluster-vault.id
-}
-
 resource "azurerm_kubernetes_cluster_extension" "flux" {
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.aks.id
@@ -131,24 +108,5 @@ resource "azurerm_role_assignment" "kv_admin" {
   scope                = azurerm_key_vault.aks-cluster-vault.id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
-}
-
-provider "kubernetes" {
-  host                   = azurerm_kubernetes_cluster.aks.kube_config.0.host
-  client_certificate     = base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)
-  client_key             = base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_key)
-  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)
-}
-
-resource "kubernetes_config_map_v1" "flux_vars" {
-  metadata {
-    name      = "cluster-vars"
-    namespace = "flux-system"
-  }
-
-  data = {
-    ESO_CLIENT_ID = azurerm_user_assigned_identity.eso_identity.client_id
-    TENANT_ID     = data.azurerm_client_config.current.tenant_id
-  }
 }
 
