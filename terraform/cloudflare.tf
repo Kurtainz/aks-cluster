@@ -39,7 +39,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "n8n_config" {
   }
 }
 
-resource "cloudflare_record" "n8n_dns" {
+resource "cloudflare_dns_record" "n8n_dns" {
   zone_id = var.cloudflare_zone_id
   name    = "n8n"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id}.cfargotunnel.com"
