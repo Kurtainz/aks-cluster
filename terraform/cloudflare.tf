@@ -25,21 +25,21 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "n8n_config" {
   account_id = var.cloudflare_account_id
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id
 
-  config {
-    ingress_rule {
-      hostname = "n8n.kclabcloud.com"
-      service  = "http://n8n.n8n.svc.cluster.local:5678"
-    }
-
-    # Catch-all rule: This is REQUIRED by Cloudflare.
-    # It returns a 404 for any traffic that doesn't match the hostname above.
-    ingress_rule {
-      service = "http_status:404"
-    }
+  config = {
+    ingress = [
+      {
+        hostname = "n8n.yourdomain.com"
+        service  = "http://n8n.n8n.svc.cluster.local:5678"
+      },
+      {
+        # The catch-all rule
+        service = "http_status:404"
+      }
+    ]
   }
 }
 
-resource "cloudflare_dns_record" "n8n_dns" {
+resource "cloudflare_record" "n8n_dns" {
   zone_id = var.cloudflare_zone_id
   name    = "n8n"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id}.cfargotunnel.com"
