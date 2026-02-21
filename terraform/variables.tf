@@ -9,6 +9,11 @@ variable "cloudflare_account_id" {
   type        = string
 }
 
+variable "cloudflare_zone_id" {
+  description = "Cloudflare zone ID"
+  type        = string
+}
+
 variable "flux_ssh_key" {
   description = "SSH Private Key for FluxCD Git sync"
   type        = string
