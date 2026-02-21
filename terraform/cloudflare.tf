@@ -51,4 +51,5 @@ resource "cloudflare_dns_record" "n8n_dns" {
   content = "${cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id}.cfargotunnel.com"
   type    = "CNAME"
   proxied = true
+  ttl     = 1
 }
