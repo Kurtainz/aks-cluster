@@ -40,7 +40,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "n8n_config" {
 }
 
 data "cloudflare_zone" "main_domain" {
-  name = "kclabcloud.com"
+  filter = {
+    name = "kclabcloud.com"
+  }
 }
 
 resource "cloudflare_dns_record" "n8n_dns" {
