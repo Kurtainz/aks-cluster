@@ -73,7 +73,7 @@ resource "random_password" "n8n_encryption_key" {
 resource "azurerm_key_vault_secret" "n8n_encryption_key" {
   name         = "n8n-encryption-key"
   value        = random_password.n8n_encryption_key.result
-  key_vault_id = azurerm_key_vault.main.id
+  key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
 resource "azurerm_kubernetes_cluster_extension" "flux" {
