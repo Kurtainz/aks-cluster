@@ -64,6 +64,18 @@ resource "azurerm_key_vault_secret" "db_password" {
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 }
 
+resource "random_password" "n8n_encryption_key" {
+  length  = 32
+  special = false
+}
+
+# Add the generated key to Key Vault
+resource "azurerm_key_vault_secret" "n8n_encryption_key" {
+  name         = "n8n-encryption-key"
+  value        = random_password.n8n_encryption_key.result
+  key_vault_id = azurerm_key_vault.main.id
+}
+
 resource "azurerm_kubernetes_cluster_extension" "flux" {
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.aks.id
