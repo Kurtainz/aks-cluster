@@ -19,6 +19,17 @@ spec:
           envFrom:
           - configMapRef:
               name: n8n-configmap
+          env:
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-db-credentials
+                  key: password
+            - name: N8N_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-db-credentials
+                  key: encryption-key
           ports:
           - containerPort: 5678
       securityContext:
