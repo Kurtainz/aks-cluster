@@ -50,18 +50,38 @@ resource "azurerm_federated_identity_credential" "eso_federated" {
   subject             = "system:serviceaccount:external-secrets:external-secrets-sa"
 }
 
-# Generate a random password for the Postgres database automatically
+resource "random_string" "n8n_db_username" {
+  length  = 12
+  special = false
+  upper   = false
+}
+
+resource "azurerm_key_vault_secret" "db_username" {
+  name         = "n8n-postgres-username"
+  value        = random_string.n8n_db_username.result
+  key_vault_id = azurerm_key_vault.aks-cluster-vault.id
+
+  lifecycle {
+    ignore_changes  = [value]
+    prevent_destroy = true
+  }
+}
+
 resource "random_password" "n8n_db_pass" {
   length           = 24
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-# Add the generated password to Key Vault
 resource "azurerm_key_vault_secret" "db_password" {
   name         = "n8n-postgres-password"
   value        = random_password.n8n_db_pass.result
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
+
+  lifecycle {
+    ignore_changes  = [value]
+    prevent_destroy = true
+  }
 }
 
 resource "random_password" "n8n_encryption_key" {
@@ -69,11 +89,15 @@ resource "random_password" "n8n_encryption_key" {
   special = false
 }
 
-# Add the generated key to Key Vault
 resource "azurerm_key_vault_secret" "n8n_encryption_key" {
   name         = "n8n-encryption-key"
   value        = random_password.n8n_encryption_key.result
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
+
+  lifecycle {
+    ignore_changes  = [value]
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_kubernetes_cluster_extension" "flux" {
