@@ -20,7 +20,10 @@ spec:
         - name: POSTGRES_DB
           value: n8n
         - name: POSTGRES_USER
-          value: n8n_user
+          valueFrom:
+            secretKeyRef:
+              name: n8n-db-secrets
+              key: username
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
