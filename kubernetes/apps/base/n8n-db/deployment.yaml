@@ -29,6 +29,8 @@ spec:
             secretKeyRef:
               name: n8n-db-credentials
               key: password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         ports:
         - containerPort: 5432
         volumeMounts:
