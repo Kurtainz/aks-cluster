@@ -13,12 +13,15 @@ spec:
       labels:
         app: n8n-postgres
     spec:
+      securityContext:
+        # Mount this disk so GID 999 owns it. Required to avoid permission issues
+        fsGroup: 999
+        fsGroupChangePolicy: "Always"
       # This is required for Postgres to create the directory for its data
       initContainers:
-        - name: fix-permissions
+        - name: set-permissions
           image: busybox
-          # We manually create the directory and give it to the postgres user (999)
-          command: ["sh", "-c", "mkdir -p /var/lib/postgresql/data/pgdata && chown -R 999:999 /var/lib/postgresql/data"]
+          command: ["sh", "-c", "mkdir -p /var/lib/postgresql/data/pgdata"]
           volumeMounts:
             - name: db-storage
               mountPath: /var/lib/postgresql/data
