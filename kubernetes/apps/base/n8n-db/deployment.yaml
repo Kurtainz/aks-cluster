@@ -20,7 +20,7 @@ spec:
           # We manually create the directory and give it to the postgres user (999)
           command: ["sh", "-c", "mkdir -p /var/lib/postgresql/data/pgdata && chown -R 999:999 /var/lib/postgresql/data"]
           volumeMounts:
-            - name: postgres-data
+            - name: db-storage
               mountPath: /var/lib/postgresql/data
               subPath: postgres
       securityContext:
