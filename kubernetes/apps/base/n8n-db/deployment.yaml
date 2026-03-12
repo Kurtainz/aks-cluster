@@ -17,6 +17,8 @@ spec:
         # Mount this disk so GID 999 owns it. Required to avoid permission issues
         fsGroup: 999
         fsGroupChangePolicy: "Always"
+        runAsUser: 999
+        runAsGroup: 999
       # This is required for Postgres to create the directory for its data
       initContainers:
         - name: set-permissions
@@ -26,10 +28,6 @@ spec:
             - name: db-storage
               mountPath: /var/lib/postgresql/data
               subPath: postgres
-      securityContext:
-        runAsUser: 999
-        runAsGroup: 999
-        fsGroup: 999
       containers:
       - name: postgres
         image: postgres:16-alpine
