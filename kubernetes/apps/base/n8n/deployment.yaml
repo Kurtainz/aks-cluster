@@ -33,7 +33,7 @@ spec:
             - name: N8N_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
-                  name: n8n-db-credentials
+                  name: n8n-secrets
                   key: encryption-key
           ports:
           - containerPort: 5678
