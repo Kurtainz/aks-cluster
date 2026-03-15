@@ -5,6 +5,8 @@ metadata:
   namespace: n8n
 spec:
   replicas: 1
+  dependsOn:
+    - name: infra-controllers
   selector:
     matchLabels:
       app: n8n
