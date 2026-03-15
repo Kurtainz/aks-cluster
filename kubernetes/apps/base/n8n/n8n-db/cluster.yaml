@@ -12,6 +12,5 @@ spec:
   bootstrap:
     initdb:
       database: n8n
-      owner: n8n
       secret:
         name: n8n-db-credentials
