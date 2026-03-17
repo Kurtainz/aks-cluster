@@ -36,24 +36,24 @@ spec:
                   key: encryption-key
           ports:
           - containerPort: 5678
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 5678
-            failureThreshold: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 5678
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 5678
-            initialDelaySeconds: 30
-            periodSeconds: 10
+#          startupProbe:
+#            httpGet:
+#              path: /healthz
+#              port: 5678
+#            failureThreshold: 60
+#            periodSeconds: 10
+#          readinessProbe:
+#            httpGet:
+#              path: /healthz
+#              port: 5678
+#            initialDelaySeconds: 10
+#            periodSeconds: 10
+#          livenessProbe:
+#            httpGet:
+#              path: /healthz
+#              port: 5678
+#            initialDelaySeconds: 30
+#            periodSeconds: 10
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
