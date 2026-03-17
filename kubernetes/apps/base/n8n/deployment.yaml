@@ -23,7 +23,10 @@ spec:
               name: n8n-configmap
           env:
             - name: DB_POSTGRESDB_USER
-              value: n8n
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-db-credentials
+                  key: username
             - name: DB_POSTGRESDB_PASSWORD
               valueFrom:
                 secretKeyRef:
