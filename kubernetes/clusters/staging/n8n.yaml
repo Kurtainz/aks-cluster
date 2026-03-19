@@ -3,9 +3,9 @@ kind: Kustomization
 metadata:
   name: n8n
   namespace: flux-system
-dependsOn:
-  - name: infra-configs
 spec:
+  dependsOn:
+    - name: infra-configs
   interval: 10m
   path: ./kubernetes/apps/staging/n8n
   prune: true
