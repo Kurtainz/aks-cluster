@@ -17,5 +17,7 @@ spec:
   managed:
     roles:
       - name: n8n
+        ensure: present
         passwordSecret:
           name: n8n-db-credentials
+          key: password
