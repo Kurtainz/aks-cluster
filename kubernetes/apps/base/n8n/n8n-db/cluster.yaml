@@ -20,4 +20,3 @@ spec:
         ensure: present
         passwordSecret:
           name: n8n-db-credentials
-          key: password
