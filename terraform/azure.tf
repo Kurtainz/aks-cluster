@@ -50,15 +50,9 @@ resource "azurerm_federated_identity_credential" "eso_federated" {
   subject             = "system:serviceaccount:external-secrets:external-secrets-sa"
 }
 
-resource "random_string" "n8n_db_username" {
-  length  = 12
-  special = false
-  upper   = false
-}
-
 resource "azurerm_key_vault_secret" "db_username" {
   name         = "n8n-postgres-username"
-  value        = random_string.n8n_db_username.result
+  value        = "n8n"
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 
   lifecycle {
