@@ -56,7 +56,6 @@ resource "azurerm_key_vault_secret" "db_username" {
   key_vault_id = azurerm_key_vault.aks-cluster-vault.id
 
   lifecycle {
-    ignore_changes  = [value]
     prevent_destroy = true
   }
 }
