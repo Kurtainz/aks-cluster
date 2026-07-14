@@ -6,6 +6,11 @@ metadata:
 spec:
   instances: 1
 
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
   storage:
     size: 5Gi
 

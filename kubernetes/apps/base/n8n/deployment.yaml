@@ -18,6 +18,10 @@ spec:
       containers:
         - name: n8n
           image: n8nio/n8n
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           envFrom:
           - configMapRef:
               name: n8n-configmap
@@ -36,24 +40,6 @@ spec:
                   key: encryption-key
           ports:
           - containerPort: 5678
-#          startupProbe:
-#            httpGet:
-#              path: /healthz
-#              port: 5678
-#            failureThreshold: 60
-#            periodSeconds: 10
-#          readinessProbe:
-#            httpGet:
-#              path: /healthz
-#              port: 5678
-#            initialDelaySeconds: 10
-#            periodSeconds: 10
-#          livenessProbe:
-#            httpGet:
-#              path: /healthz
-#              port: 5678
-#            initialDelaySeconds: 30
-#            periodSeconds: 10
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
