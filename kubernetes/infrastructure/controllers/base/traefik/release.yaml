@@ -13,21 +13,30 @@ spec:
         kind: HelmRepository
         name: traefik
         namespace: flux-system
+
   interval: 1h
+
+  targetNamespace: traefik
+
   install:
     createNamespace: true
+
   values:
-    # Production settings
     deployment:
-      replicas: 2
+      replicas: 1
+
     service:
-      annotations:
-        # AKS specific: Tells Azure to create a Standard Load Balancer
-        service.beta.kubernetes.io/azure-load-balancer-sku: Standard 
+      type: ClusterIP
+
     ports:
       web:
-        redirectTo:
-          port: websecure # Force HTTPS
+        port: 8000
+        expose:
+          default: true
+        exposedPort: 80
+
       websecure:
-        tls:
-          enabled: true
+        port: 8443
+        expose:
+          default: true
+        exposedPort: 443
