@@ -29,7 +29,11 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "n8n_config" {
     ingress = [
       {
         hostname = "n8n.kclabcloud.com"
-        service  = "http://n8n.n8n.svc.cluster.local:5678"
+        service  = "http://traefik.traefik.svc.cluster.local:80"
+      },
+      {
+        hostname = "grafana.kclabcloud.com"
+        service  = "http://traefik.traefik.svc.cluster.local:80"
       },
       {
         # The catch-all rule
@@ -48,6 +52,15 @@ data "cloudflare_zone" "main_domain" {
 resource "cloudflare_dns_record" "n8n_dns" {
   zone_id = data.cloudflare_zone.main_domain.id
   name    = "n8n"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id}.cfargotunnel.com"
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1
+}
+
+resource "cloudflare_dns_record" "grafana_dns" {
+  zone_id = data.cloudflare_zone.main_domain.id
+  name    = "grafana"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.prod_tunnel.id}.cfargotunnel.com"
   type    = "CNAME"
   proxied = true

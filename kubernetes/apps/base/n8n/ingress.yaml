@@ -7,10 +7,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - cloud-n8n.kclabcloud.com
+        - n8n.kclabcloud.com
       secretName: n8n-tls
   rules:
-    - host: cloud-n8n.kclabcloud.com
+    - host: n8n.kclabcloud.com
       http:
         paths:
           - path: /

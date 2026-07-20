@@ -3,16 +3,10 @@ kind: Ingress
 metadata:
   name: grafana-ingress
   namespace: monitoring
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
-  tls:
-    - hosts:
-        - cloud-monitoring.kclabcloud.com
-      secretName: monitoring-tls
   rules:
-    - host: cloud-monitoring.kclabcloud.com
+    - host: grafana.kclabcloud.com
       http:
         paths:
           - path: /
