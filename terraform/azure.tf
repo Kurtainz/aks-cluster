@@ -93,6 +93,22 @@ resource "azurerm_key_vault_secret" "n8n_encryption_key" {
   }
 }
 
+resource "random_password" "grafana_password" {
+  length  = 32
+  special = false
+}
+
+resource "azurerm_key_vault_secret" "grafana_password" {
+  name         = "grafana-password"
+  value        = random_password.grafana_password.result
+  key_vault_id = azurerm_key_vault.aks-cluster-vault.id
+
+  lifecycle {
+    ignore_changes  = [value]
+    prevent_destroy = true
+  }
+}
+
 resource "azurerm_kubernetes_cluster_extension" "flux" {
   name           = "flux"
   cluster_id     = azurerm_kubernetes_cluster.aks.id
