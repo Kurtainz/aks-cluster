@@ -32,6 +32,11 @@ spec:
           memory: 256Mi
           cpu: 200m
 
+      admin:
+        existingSecret: grafana-secrets
+        userKey: admin-username
+        passwordKey: admin-password
+
     prometheus:
       enabled: true
 
